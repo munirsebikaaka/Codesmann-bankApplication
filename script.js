@@ -17,9 +17,9 @@ const account1 = {
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
     '2020-05-08T14:11:59.604Z',
-    '2024-04-04T17:01:17.194Z',
-    '2024-04-05T23:36:17.929Z',
-    '2024-04-08T10:51:36.790Z',
+    '2024-04-29T17:01:17.194Z',
+    '2024-05-01T23:36:17.929Z',
+    '2024-05-03T10:51:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT',
@@ -72,22 +72,34 @@ const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
-
+function formatDates(date) {
+  const calcdaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+  const daysPassed = calcdaysPassed(new Date(), date);
+  console.log(daysPassed);
+  if (daysPassed === 0) return 'Today';
+  if (daysPassed === 1) return 'Yesturday';
+  if (daysPassed === 1) return `${daysPassed} days have past`;
+  const days = String(date.getDate()).padStart(2, 0);
+  const month = String(date.getMonth()).padStart(2, 0);
+  const year = date.getFullYear();
+  return `${days}/${month}/${year}`;
+}
 function displayMovents(acc) {
   acc.movements.forEach((mov, i) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(acc.movementsDates[i]);
-    const days = String(date.getDate()).padStart(2, 0);
-    const month = String(date.getMonth()).padStart(2, 0);
-    const year = date.getFullYear();
-    const displayDate = `${days}/${month}/${year}`;
+    const displayDate = formatDates(date);
     let htmlCode = `
       <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
     <div class="movements__date">${displayDate}</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${new Intl.NumberFormat(acc.locale, {
+            style: 'currency',
+            currency: acc.currency,
+          }).format(mov)}</div>
         </div>
       `;
     containerMovements.insertAdjacentHTML('afterbegin', htmlCode);
@@ -182,6 +194,8 @@ btnTransfer.addEventListener('click', e => {
   ) {
     receiverAcount.movements.push(amount);
     currentAccout.movements.push(-amount);
+    currentAccout.movementsDates.push(new Date());
+    receiverAcount.movementsDates.push(new Date());
     upDateUI(currentAccout);
     inputTransferTo.value = '';
     inputTransferAmount.value = '';
@@ -192,6 +206,7 @@ btnLoan.addEventListener('click', e => {
   const amount = +inputLoanAmount.value;
   if (amount > 0 && currentAccout.movements.some(mov => mov >= amount / 10)) {
     currentAccout.movements.push(amount);
+    currentAccout.movementsDates.push(new Date());
   }
   inputLoanAmount.value = '';
   upDateUI(currentAccout);
@@ -218,6 +233,3 @@ btnClose.addEventListener('click', e => {
 // LECTures
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-const now = new Date();
-const intenation = new Intl.DateTimeFormat(account1.locale).format(now);
-console.log(intenation);
