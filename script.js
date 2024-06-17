@@ -160,7 +160,17 @@ const upDateUI = bigAC => {
   ////////////////////////////
   displaySummerry(bigAC);
 };
+const logOutEL = document.querySelector('.timer');
 let currentAccout;
+let time = 280;
+function logOutFUNCTION() {
+  const minutes = Math.trunc(time / 60) + ''.padStart(0, 2);
+  const seconds = Math.trunc(time % 60) + ''.padStart(0, 2);
+  logOutEL.textContent = `${minutes}:${seconds}`;
+  time--;
+  if (time < 0) containerApp.style.opacity = 0;
+}
+
 btnLogin.addEventListener('click', e => {
   e.preventDefault();
   currentAccout = accounts.find(
@@ -180,6 +190,9 @@ btnLogin.addEventListener('click', e => {
     ).format(now);
     upDateUI(currentAccout);
   }
+  setInterval(() => {
+    logOutFUNCTION();
+  }, 1000);
 });
 btnTransfer.addEventListener('click', e => {
   e.preventDefault();
@@ -227,9 +240,3 @@ btnClose.addEventListener('click', e => {
     inputClosePin.value = '';
   }
 });
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTures
-
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
